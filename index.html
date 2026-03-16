@@ -35,15 +35,34 @@
     <h1>Привет! Это мое приложение.</h1>
     <button id="show-user">Узнать мой ID</button>
 
-    <script>
-        // Инициализируем VK Bridge
-        vkBridge.send('VKWebAppInit');
+<div id="user-info">
+    <h1 id="greeting">Загрузка...</h1>
+    <img id="avatar" src="" style="border-radius: 50%; display: none; width: 100px;">
+</div>
 
-        document.getElementById('show-user').onclick = function() {
-            vkBridge.send('VKWebAppGetUserInfo').then((data) => {
-                alert('Твой ID: ' + data.id);
-            });
-        };
-    </script>
+<script>
+    // 1. Инициализация (обязательно!)
+    vkBridge.send('VKWebAppInit');
+
+    // 2. Запрос данных профиля при запуске
+    vkBridge.send('VKWebAppGetUserInfo')
+        .then((data) => {
+            if (data.id) {
+                // Если данные получены, выводим имя и аватар
+                document.getElementById('greeting').innerText = `Привет, ${data.first_name}!`;
+                
+                const avatar = document.getElementById('avatar');
+                avatar.src = data.photo_100;
+                avatar.style.display = 'block';
+            }
+        })
+        .catch((error) => {
+            // Если пользователь запретил доступ или произошла ошибка
+            console.error(error);
+            document.getElementById('greeting').innerText = 'Ошибка доступа';
+        });
+</script>
+
+
 </body>
 </html>
